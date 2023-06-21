@@ -1,0 +1,4 @@
+name: NoBoost
+version: '${project.version}'
+main: net.craftsupport.noboost.NoBoost
+api-version: "1.13"
