@@ -25,7 +25,6 @@ saveDefaultConfig();
     }
     @EventHandler
     public void onBoost(PlayerElytraBoostEvent event) {
-getLogger().info(event.getPlayer().getWorld().getName());
         if (getConfig().getBoolean("per-world") && !getConfig().getBoolean("send-message")) {
             if (getConfig().getList("allowed-worlds").contains(event.getPlayer().getWorld().getName())) {
                 event.setCancelled(false);
