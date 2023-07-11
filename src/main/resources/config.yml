@@ -1,2 +1,4 @@
 message: ""
 send-message: false
+per-world: false
+allowed-worlds: []

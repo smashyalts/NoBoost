@@ -25,11 +25,25 @@ saveDefaultConfig();
     }
     @EventHandler
     public void onBoost(PlayerElytraBoostEvent event) {
-        if (getConfig().getString("message") != null && getConfig().getBoolean("send-message")) {
+getLogger().info(event.getPlayer().getWorld().getName());
+        if (getConfig().getBoolean("per-world") && !getConfig().getBoolean("send-message")) {
+            if (getConfig().getList("allowed-worlds").contains(event.getPlayer().getWorld().getName())) {
+                event.setCancelled(false);
+            }
+            else event.setCancelled(true);
+        }
+        if (getConfig().getBoolean("per-world") && getConfig().getBoolean("send-message")) {
+            if (getConfig().getList("allowed-worlds").contains(event.getPlayer().getWorld().getName())) {
+                event.setCancelled(false);
+            }
+            else {event.setCancelled(true);
+                Component message = mm.deserialize(getConfig().getString("message"));
+                event.getPlayer().sendMessage(message);}
+        }
+        if (getConfig().getString("message") != null && getConfig().getBoolean("send-message") && !getConfig().getBoolean("per-world")) {
             Component message = mm.deserialize(getConfig().getString("message"));
             event.getPlayer().sendMessage(message);
             event.setCancelled(true);
         }
-        event.setCancelled(true);
     }
 }
