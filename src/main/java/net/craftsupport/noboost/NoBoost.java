@@ -8,41 +8,36 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-
+import java.util.List;
+import java.util.Optional;
 
 public final class NoBoost extends JavaPlugin implements Listener {
-MiniMessage mm = MiniMessage.miniMessage();
+    private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
+
     @Override
     public void onEnable() {
         // Plugin startup logic
 
         Bukkit.getServer().getPluginManager().registerEvents(this, this);
-saveDefaultConfig();
+        this.saveDefaultConfig();
     }
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-    }
+
     @EventHandler
     public void onBoost(PlayerElytraBoostEvent event) {
-        if (getConfig().getBoolean("per-world") && !getConfig().getBoolean("send-message")) {
-            if (getConfig().getList("allowed-worlds").contains(event.getPlayer().getWorld().getName())) {
-                event.setCancelled(false);
-            }
-            else event.setCancelled(true);
+        if (this.getConfig().getBoolean("per-world")) {
+            List<?> allowedWorlds = Optional.ofNullable(this.getConfig().getList("allowed-worlds")).orElse(List.of());
+            boolean allowWorld = allowedWorlds.contains(event.getPlayer().getWorld().getName());
+            if (allowWorld) return;
         }
-        if (getConfig().getBoolean("per-world") && getConfig().getBoolean("send-message")) {
-            if (getConfig().getList("allowed-worlds").contains(event.getPlayer().getWorld().getName())) {
-                event.setCancelled(false);
-            }
-            else {event.setCancelled(true);
-                Component message = mm.deserialize(getConfig().getString("message"));
-                event.getPlayer().sendMessage(message);}
-        }
-        if (getConfig().getString("message") != null && getConfig().getBoolean("send-message") && !getConfig().getBoolean("per-world")) {
-            Component message = mm.deserialize(getConfig().getString("message"));
-            event.getPlayer().sendMessage(message);
-            event.setCancelled(true);
+
+        event.setCancelled(true);
+
+        if (this.getConfig().getBoolean("send-message")) {
+            Component cancelMessage = Optional
+                .ofNullable(this.getConfig().getString("message"))
+                .map(NoBoost.MINI_MESSAGE::deserialize)
+                .orElse(Component.empty());
+            event.getPlayer().sendMessage(cancelMessage);
         }
     }
 }
